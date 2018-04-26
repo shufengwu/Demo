@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<litepal>
+    <dbname value="demo" />
+    <version value="11" />
+    <list>
+        <mapping class="com.example.wushufeng.demo.entity.News"></mapping>
+        <mapping class="com.example.wushufeng.demo.entity.Comment"></mapping>
+        <mapping class="com.example.wushufeng.demo.entity.Introduction"></mapping>
+        <mapping class="com.example.wushufeng.demo.entity.Category"></mapping>
+    </list>
+</litepal>
