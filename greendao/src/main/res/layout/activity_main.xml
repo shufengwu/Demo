@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+
+    <ScrollView
+        android:id="@+id/sv_data"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btn_insert_one_data"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="插入一条数据" />
+
+            <Button
+                android:id="@+id/btn_insert_multiple_data"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="插入多条数据" />
+
+            <Button
+                android:id="@+id/btn_query_data"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="查询所有数据" />
+            <Button
+                android:id="@+id/btn_query_data_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="查询姓名为wsf的数据" />
+            <Button
+                android:id="@+id/btn_query_data_order_down"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="查询所有数据，降序排列" />
+
+            <Button
+                android:id="@+id/btn_query_data_order_up"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="查询所有数据，升序排列" />
+
+            <Button
+                android:id="@+id/btn_query_data_above"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="查询所有大于50数据" />
+            <Button
+                android:id="@+id/btn_query_data_below"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="查询所有小于50数据" />
+            <Button
+                android:id="@+id/btn_query_data_first_five"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="查询前五条数据" />
+            <Button
+                android:id="@+id/btn_query_data_first_five_jump_three"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="查询前五条数据，跳过前三条" />
+            <Button
+                android:id="@+id/btn_query_data_amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="查询数据总条数" />
+            <Button
+                android:id="@+id/btn_delete_data_name_wsf"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="删除名为wsf的数据" />
+            <Button
+                android:id="@+id/btn_delete_data_name_sfw"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="删除名为sfw的数据" />
+            <Button
+                android:id="@+id/btn_update_data"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="更新名为wsf数据为sfw" />
+
+            <TextView
+                android:id="@+id/tv_data"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
