@@ -22,6 +22,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
+        debug {
+            resValue("string", "PORT_NUMBER", "5555")
+        }
     }
 
 }
@@ -40,4 +44,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'org.greenrobot:greendao:3.2.2' // add greendao library
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.3' // Android-Debug-Database
+
+    implementation 'com.jakewharton.rxbinding:rxbinding:1.0.1'
+    implementation 'io.reactivex:rxandroid:1.2.1'
+    implementation 'io.reactivex:rxjava:1.2.9'
 }

@@ -4,15 +4,19 @@ import android.app.Application;
 
 import com.example.greendao.entity.DaoMaster;
 import com.example.greendao.entity.DaoSession;
-import com.example.greendao.entity.PictureDao;
+import com.example.greendao.entity.Student;
 import com.example.greendao.entity.StudentDao;
+import org.greenrobot.greendao.query.QueryBuilder;
+import org.greenrobot.greendao.rx.RxDao;
 
 public class App extends Application {
     DaoMaster.DevOpenHelper devOpenHelper;
     DaoMaster daoMaster;
     static DaoSession daoSession;
     static StudentDao stuDao = null;
-    static PictureDao pictureDao = null;
+    static RxDao<Student,Long> rxStuDao = null;
+    //static RxQuery<Student> rxQueryStuDao = null;
+    static QueryBuilder<Student> rxQueryStuDaoBuilder = null;
 
     @Override
     public void onCreate() {
@@ -32,10 +36,21 @@ public class App extends Application {
 
     }
 
-    public static PictureDao getPictureDao(){
-        if(pictureDao==null){
-            pictureDao = daoSession.getPictureDao();
+    public static RxDao<Student, Long> getRxStuDao() {
+
+        if (rxStuDao == null) {
+            rxStuDao = daoSession.getStudentDao().rx();
         }
-        return pictureDao;
+        return rxStuDao;
+
+    }
+
+    public static QueryBuilder<Student> getRxQueryStuDaoBuilder() {
+
+        if (rxQueryStuDaoBuilder == null) {
+            rxQueryStuDaoBuilder = daoSession.getStudentDao().queryBuilder();
+        }
+        return rxQueryStuDaoBuilder;
+
     }
 }
