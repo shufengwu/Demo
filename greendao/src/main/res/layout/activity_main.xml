@@ -113,11 +113,11 @@
                 android:layout_height="wrap_content" />
 
             <Button
-                android:id="@+id/btn_to_one_add"
+                android:id="@+id/btn_test_multi_table"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
-                android:text="ToOne增加测试" />
+                android:text="多表关联测试" />
         </LinearLayout>
     </ScrollView>
 

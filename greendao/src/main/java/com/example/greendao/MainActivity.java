@@ -1,5 +1,6 @@
 package com.example.greendao;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnUpdateData = findViewById(R.id.btn_update_data);
         btnUpdateData.setOnClickListener(this);
         tvData = findViewById(R.id.tv_data);
-        btnToOneAdd = findViewById(R.id.btn_to_one_add);
+        btnToOneAdd = findViewById(R.id.btn_test_multi_table);
         btnToOneAdd.setOnClickListener(this);
     }
 
@@ -124,43 +125,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_update_data:
                 updateData();
                 break;
-            case R.id.btn_to_one_add:
-                testAddToOne();
+            case R.id.btn_test_multi_table:
+                startActivity(new Intent(MainActivity.this,MultiTableActivity.class));
                 break;
             default:
                 break;
         }
     }
 
-    private void testAddToOne() {
-        Picture picture = new Picture(null,"pic_1");
-        App.getDaoSession().getPictureDao().rx().insert(picture)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Picture>() {
-                    @Override
-                    public void call(Picture picture) {
-                        App.getDaoSession().getPersonDao().rx()
-                                .insert(new Person(null,"beijing",picture.getId()))
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(new Action1<Person>() {
-                                    @Override
-                                    public void call(Person person) {
 
-                                    }
-                                }, new Action1<Throwable>() {
-                                    @Override
-                                    public void call(Throwable throwable) {
 
-                                    }
-                                });
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
 
-                    }
-                });
-    }
 
     /**
      * 更新数据
