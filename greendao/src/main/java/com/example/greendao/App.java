@@ -4,6 +4,8 @@ import android.app.Application;
 
 import com.example.greendao.entity.DaoMaster;
 import com.example.greendao.entity.DaoSession;
+import com.example.greendao.entity.Picture;
+import com.example.greendao.entity.PictureDao;
 import com.example.greendao.entity.Student;
 import com.example.greendao.entity.StudentDao;
 import org.greenrobot.greendao.query.QueryBuilder;
@@ -14,6 +16,7 @@ public class App extends Application {
     DaoMaster daoMaster;
     static DaoSession daoSession;
     static StudentDao stuDao = null;
+    static PictureDao pictureDao = null;
     static RxDao<Student,Long> rxStuDao = null;
     //static RxQuery<Student> rxQueryStuDao = null;
     static QueryBuilder<Student> rxQueryStuDaoBuilder = null;
@@ -27,6 +30,9 @@ public class App extends Application {
         daoSession = daoMaster.newSession();
     }
 
+    public static DaoSession getDaoSession(){
+        return daoSession;
+    }
     public static StudentDao getStuDao() {
 
         if (stuDao == null) {

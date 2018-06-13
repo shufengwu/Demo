@@ -1,5 +1,6 @@
 package com.example.greendao;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -7,6 +8,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.greendao.entity.Person;
+import com.example.greendao.entity.Picture;
+import com.example.greendao.entity.PictureDao;
 import com.example.greendao.entity.Student;
 import com.example.greendao.entity.StudentDao;
 
@@ -36,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button btnDeleteDataNameWsf;
     Button btnUpdateData;
     TextView tvData;
+    Button btnToOneAdd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnUpdateData = findViewById(R.id.btn_update_data);
         btnUpdateData.setOnClickListener(this);
         tvData = findViewById(R.id.tv_data);
+        btnToOneAdd = findViewById(R.id.btn_test_multi_table);
+        btnToOneAdd.setOnClickListener(this);
     }
 
     @Override
@@ -118,10 +125,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_update_data:
                 updateData();
                 break;
+            case R.id.btn_test_multi_table:
+                startActivity(new Intent(MainActivity.this,MultiTableActivity.class));
+                break;
             default:
                 break;
         }
     }
+
+
+
+
 
     /**
      * 更新数据
@@ -137,25 +151,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }*/
     private void updateData() {
-        App.getRxStuDao()
-                .updateInTx(
-                        App.getStuDao().queryBuilder().where(StudentDao.Properties.StuName.eq("wsf")).list()
-                ).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Action1<Iterable<Student>>() {
-                    @Override
-                    public void call(Iterable<Student> students) {
-                        for (Iterator iterator = students.iterator(); iterator.hasNext(); ) {
-                            ((Student) iterator.next()).setStuName("sfw");
-                        }
-                        Toast.makeText(MainActivity.this, "更新数据成功", Toast.LENGTH_SHORT).show();
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        Toast.makeText(MainActivity.this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+        List<Student> list = App.getStuDao().queryBuilder().where(StudentDao.Properties.StuName.eq("wsf")).list();
+        for(Student s:list){
+            s.setStuName("sfw");
+        }
+        Observable<Iterable<Student>> observable = App.getStuDao().rx()
+                .updateInTx(list).observeOn(AndroidSchedulers.mainThread());
+        observable.subscribe(new Action1<Iterable<Student>>() {
+            @Override
+            public void call(Iterable<Student> students) {
+                
+                Toast.makeText(MainActivity.this, "更新数据成功", Toast.LENGTH_SHORT).show();
+            }
+        }, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                Toast.makeText(MainActivity.this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
@@ -171,49 +184,85 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 删除指定数据:RxJava
      */
     private void deleteDataNameSfw() {
-        App.getRxStuDao()
+        Observable<Void> observable = App.getStuDao().rx()
                 .deleteInTx(
                         App.getStuDao().queryBuilder().where(StudentDao.Properties.StuName.eq("sfw")
                         ).list())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Action1<Void>() {
-                    @Override
-                    public void call(Void aVoid) {
-                        Toast.makeText(MainActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        Toast.makeText(MainActivity.this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-        /*App.getStuDao().queryBuilder().where(StudentDao.Properties.StuName.eq("sfw")).buildDelete().executeDeleteWithoutDetachingEntities();
-        Toast.makeText(this, "删除名为sfw的数据！", Toast.LENGTH_SHORT).show();*/
+                .observeOn(AndroidSchedulers.mainThread());
+        observable.subscribe(new Action1<Void>() {
+            @Override
+            public void call(Void aVoid) {
+                Toast.makeText(MainActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
+            }
+        }, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                Toast.makeText(MainActivity.this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**
      * 删除指定数据
      */
-    private void deleteDataNameWsf() {
+    /*private void deleteDataNameWsf() {
         //App.getRxQueryStuDaoBuilder().where(StudentDao.Properties.StuName.eq("wsf")).rx()
         App.getStuDao().queryBuilder().where(StudentDao.Properties.StuName.eq("wsf")).buildDelete().executeDeleteWithoutDetachingEntities();
         Toast.makeText(this, "删除名为wsf的数据！", Toast.LENGTH_SHORT).show();
+    }*/
+
+    /**
+     * 删除指定数据    RxJava
+     */
+    private void deleteDataNameWsf() {
+        Observable<Void> observable = App.getStuDao().rx().deleteInTx(App.getStuDao().queryBuilder().where(StudentDao.Properties.StuName.eq("wsf")).list());
+        observable.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Void>() {
+                    @Override
+                    public void call(Void v) {
+                        Toast.makeText(MainActivity.this, "删除名为wsf的数据！", Toast.LENGTH_SHORT).show();
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+
+                    }
+                });
+
     }
 
     /**
      * 查询数据总数
      */
-    private void queryDataAmount() {
+    /*private void queryDataAmount() {
         int count = App.getStuDao().queryBuilder().list().size();
         Toast.makeText(this, "数据总条数 " + count, Toast.LENGTH_SHORT).show();
+    }*/
+
+    /**
+     * 查询数据总数  Rxjava
+     */
+    private void queryDataAmount() {
+        Observable<List<Student>> observable = App.getStuDao().queryBuilder().rx().list();
+        observable.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<List<Student>>() {
+                    @Override
+                    public void call(List<Student> students) {
+                        Toast.makeText(MainActivity.this, "数据总条数 " + students.size(), Toast.LENGTH_SHORT).show();
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+
+                    }
+                });
+
     }
 
     /**
      * 前五条数据，跳过前三条
      */
-    private void queryDataFirstFiveJumpThree() {
+    /*private void queryDataFirstFiveJumpThree() {
         List<Student> stuList = App.getStuDao().queryBuilder().limit(5).offset(3).list();
         if (stuList != null) {
             String searchAllInfo = "";
@@ -223,12 +272,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             tvData.setText(searchAllInfo);
         }
+    }*/
+
+    /**
+     * 前五条数据，跳过前三条    RxJava
+     */
+    private void queryDataFirstFiveJumpThree() {
+        Observable<List<Student>> observable = App.getStuDao().queryBuilder().limit(5).offset(3).rx().list();
+        observable.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<List<Student>>() {
+                    @Override
+                    public void call(List<Student> students) {
+                        if (students != null) {
+                            String searchAllInfo = "";
+                            for (int i = 0; i < students.size(); i++) {
+                                Student stu = students.get(i);
+                                searchAllInfo += "id：" + stu.getStuId() + " 编号：" + stu.getStuNo() + " 姓名：" + stu.getStuName() + " 性别：" + stu.getStuSex() + " 成绩：" + stu.getStuScore() + "\n";
+                            }
+                            tvData.setText(searchAllInfo);
+                        }
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+
+                    }
+                });
+
     }
 
     /**
      * 前五条数据
      */
-    private void queryDataFirstFive() {
+    /*private void queryDataFirstFive() {
         List<Student> stuList = App.getStuDao().queryBuilder().limit(5).list();
         if (stuList != null) {
             String searchAllInfo = "";
@@ -238,6 +314,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             tvData.setText(searchAllInfo);
         }
+    }*/
+
+    /**
+     * 前五条数据    RxJava
+     */
+    private void queryDataFirstFive() {
+        Observable<List<Student>> observable = App.getStuDao().queryBuilder().limit(5).rx().list();
+        observable.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<List<Student>>() {
+                    @Override
+                    public void call(List<Student> students) {
+                        if (students != null) {
+                            String searchAllInfo = "";
+                            for (int i = 0; i < students.size(); i++) {
+                                Student stu = students.get(i);
+                                searchAllInfo += "id：" + stu.getStuId() + " 编号：" + stu.getStuNo() + " 姓名：" + stu.getStuName() + " 性别：" + stu.getStuSex() + " 成绩：" + stu.getStuScore() + "\n";
+                            }
+                            tvData.setText(searchAllInfo);
+                        }
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+
+                    }
+                });
+
     }
 
     /**
@@ -247,7 +350,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * le 小于等于
      * ge 大于等于
      */
-    private void queryDataBelow() {
+    /*private void queryDataBelow() {
         List<Student> stuList = App.getStuDao().queryBuilder().where(StudentDao.Properties.StuScore.lt(50)).list();
         if (stuList != null) {
             String searchAllInfo = "";
@@ -257,9 +360,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             tvData.setText(searchAllInfo);
         }
+    }*/
+    private void queryDataBelow() {
+        Observable<List<Student>> observable = App.getStuDao().queryBuilder().where(StudentDao.Properties.StuScore.lt(50)).rx().list();
+        observable.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<List<Student>>() {
+                    @Override
+                    public void call(List<Student> students) {
+                        if (students != null) {
+                            String searchAllInfo = "";
+                            for (int i = 0; i < students.size(); i++) {
+                                Student stu = students.get(i);
+                                searchAllInfo += "id：" + stu.getStuId() + " 编号：" + stu.getStuNo() + " 姓名：" + stu.getStuName() + " 性别：" + stu.getStuSex() + " 成绩：" + stu.getStuScore() + "\n";
+                            }
+                            tvData.setText(searchAllInfo);
+                        }
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+
+                    }
+                });
+
     }
 
-    private void queryDataAbove() {
+    /*private void queryDataAbove() {
         List<Student> stuList = App.getStuDao().queryBuilder().where(StudentDao.Properties.StuScore.gt(50)).list();
         if (stuList != null) {
             String searchAllInfo = "";
@@ -269,6 +395,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             tvData.setText(searchAllInfo);
         }
+    }*/
+
+    private void queryDataAbove() {
+        Observable<List<Student>> observable = App.getStuDao().queryBuilder().where(StudentDao.Properties.StuScore.gt(50)).rx().list();
+        observable.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<List<Student>>() {
+                    @Override
+                    public void call(List<Student> students) {
+                        if (students != null) {
+                            String searchAllInfo = "";
+                            for (int i = 0; i < students.size(); i++) {
+                                Student stu = students.get(i);
+                                searchAllInfo += "id：" + stu.getStuId() + " 编号：" + stu.getStuNo() + " 姓名：" + stu.getStuName() + " 性别：" + stu.getStuSex() + " 成绩：" + stu.getStuScore() + "\n";
+                            }
+                            tvData.setText(searchAllInfo);
+                        }
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+
+                    }
+                });
     }
 
     /**
@@ -290,12 +439,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 查询数据降序排列:Rxjava
      */
     private void queryDataByOrderDown() {
-        App.getRxQueryStuDaoBuilder()
-                .orderDesc(StudentDao.Properties.StuScore)
-                .rx()
-                .list()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+        Observable<List<Student>> observable = App.getStuDao().queryBuilder().orderDesc(StudentDao.Properties.StuScore).rx().list();
+        observable.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<List<Student>>() {
                     @Override
                     public void call(List<Student> students) {
@@ -336,12 +481,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 查询数据升序排列:Rxjava
      */
     private void queryDataByOrderUp() {
-        App.getRxQueryStuDaoBuilder()
-                .orderAsc(StudentDao.Properties.StuScore)
-                .rx()
-                .list()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
+        Observable<List<Student>> observable = App.getStuDao().queryBuilder().orderAsc(StudentDao.Properties.StuScore).rx().list();
+        observable.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<List<Student>>() {
                     @Override
                     public void call(List<Student> students) {
@@ -379,12 +520,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }*/
 
     /**
-     * 根据条件查询:Rxjava
+     * 根据条件查询:Rxjava QueryBuilder
      */
     private void queryDataByName() {
-        App.getRxQueryStuDaoBuilder().where(StudentDao.Properties.StuName.eq("wsf")).rx().list()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
+        Observable<List<Student>> observable = App.getStuDao().queryBuilder().where(StudentDao.Properties.StuName.eq("wsf")).rx().list();
+        observable.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<List<Student>>() {
                     @Override
                     public void call(List<Student> students) {
@@ -423,12 +563,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }*/
 
     /**
-     * 查询所有数据:Rxjava
+     * 查询所有数据:Rxjava QueryBuilder
      */
-    private void queryData() {
+    /*private void queryData() {
         App.getRxQueryStuDaoBuilder().rx().list()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<List<Student>>() {
+                    @Override
+                    public void call(List<Student> students) {
+                        if (students != null) {
+                            String searchAllInfo = "";
+                            for (int i = 0; i < students.size(); i++) {
+                                Student stu = students.get(i);
+                                searchAllInfo += "id：" + stu.getStuId() + " 编号：" + stu.getStuNo() + " 姓名：" + stu.getStuName() + " 性别：" + stu.getStuSex() + " 成绩：" + stu.getStuScore() + "\n";
+                            }
+                            tvData.setText(searchAllInfo);
+                        }
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Toast.makeText(MainActivity.this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }*/
+
+    /**
+     * 查询所有数据:Rxjava loadAll
+     */
+
+    private void queryData() {
+        Observable<List<Student>> observable = App.getStuDao().rx().loadAll();
+        observable.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<List<Student>>() {
                     @Override
                     public void call(List<Student> students) {
@@ -473,21 +640,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         stuList.add(new Student(null, "006", "sfw", "M", "35"));
         stuList.add(new Student(null, "007", "sfw", "M", "99"));
         stuList.add(new Student(null, "008", "sfw", "M", "88"));
-        App.getRxStuDao().insertInTx(stuList)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Iterable<Student>>() {
-                    @Override
-                    public void call(Iterable<Student> students) {
-                        Toast.makeText(MainActivity.this, "新增成功！", Toast.LENGTH_SHORT).show();
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        Toast.makeText(MainActivity.this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
 
-                });
+        Observable<Iterable<Student>> observable = App.getStuDao().rx().insertInTx(stuList)
+                .observeOn(AndroidSchedulers.mainThread());
+        observable.subscribe(new Action1<Iterable<Student>>() {
+            @Override
+            public void call(Iterable<Student> students) {
+                Toast.makeText(MainActivity.this, "新增成功！", Toast.LENGTH_SHORT).show();
+            }
+        }, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                Toast.makeText(MainActivity.this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+        });
     }
 
     /**
@@ -510,8 +677,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void insertOneData() {
         Student stu = new Student(null, "001", "wsf", "F", "50");
-        Observable<Student> observable = App.getRxStuDao().insert(stu).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io());
+        Observable<Student> observable = App.getStuDao().rx().insert(stu).observeOn(AndroidSchedulers.mainThread());
         observable.subscribe(new Action1<Student>() {
             @Override
             public void call(Student student) {
